@@ -3,10 +3,11 @@ module Capybara
     attr_reader :name
 
     class Normalized
-      attr_accessor :selector, :locator, :options, :xpaths
+      attr_accessor :selector, :locator, :options, :xpaths, :extensions
 
       def failure_message; selector.failure_message; end
       def name; selector.name; end
+      def extensions; selector.extensions; end
     end
 
     class << self
@@ -63,6 +64,12 @@ module Capybara
     def failure_message(&block)
       @failure_message = block if block
       @failure_message
+    end
+
+    def extensions(*extensions, &block)
+      extensions.push(Module.new(&block)) if block
+      @extensions = extensions if extensions.empty?
+      @extensions || []
     end
 
     def call(locator)

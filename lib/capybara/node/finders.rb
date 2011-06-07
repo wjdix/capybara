@@ -143,18 +143,29 @@ module Capybara
         options = extract_normalized_options(args)
         found_elements = []
 
-        Capybara::Selector.normalize(*args).xpaths.each do |path|
+        selector = Capybara::Selector.normalize(*args)
+        selector.xpaths.each do |path|
           find_in_base(path).each do |node|
             if matches_options(node, options)
               found_elements << convert_element(node)
-              return found_elements.last if not Capybara.prefer_visible_elements or node.visible?
+              if not Capybara.prefer_visible_elements or node.visible?
+                return extend_result(found_elements.last, selector)
+              end
             end
           end
         end
-        found_elements.first
+        result = found_elements.first
+        extend_result(result)
       end
 
     protected
+
+      def extend_result(result, selector)
+        selector.extensions.each { |extension| result.extend(extension) }
+        p selector
+        p selector.extensions
+        result
+      end
 
       def find_in_base(xpath)
         base.find(xpath)
