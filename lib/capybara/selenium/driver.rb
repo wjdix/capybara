@@ -116,6 +116,7 @@ class Capybara::Selenium::Driver < Capybara::Driver::Base
     @browser.quit
   rescue Errno::ECONNREFUSED
     # Browser must have already gone
+  rescue Errno::ECONNRESET
   end
 
 private
